@@ -124,6 +124,16 @@ def preprocess_input(data):
     def get_season(m): 
         return ["winter", "spring", "summer", "autumn"][(m % 12) // 3]
     df['season'] = df['month'].apply(get_season)
+    def trend_by_month(month):
+        if 4 < month <= 9:
+            return "on_dinh"
+        elif month in [10, 11, 12]:
+            return "tang"
+        elif month in [1, 2]:
+            return "ngang"
+        else:
+            return "giam"
+    df['trend_by_month'] = df['month'].apply(trend_by_month)
 
     X_num = df[['sin_month', 'cos_month', 'sin_dayofweek', 'cos_dayofweek']]
     X_cat = ohe.transform(df[categorical_cols])
