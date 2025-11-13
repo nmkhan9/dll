@@ -102,7 +102,7 @@ ENCODER_PATH = r"E:\Pycode\Thuchanhbaocao2\model\onehot_encoder.pkl"
 lr_model = load(MODEL_PATH)
 ohe = load(ENCODER_PATH)
 
-categorical_cols = ['season', 'carrier', 'origin', 'destination', 'year', 'quarter', 'month', 'day']
+categorical_cols = ['season','carrier', 'origin', 'destination', 'year','quarter','month', 'day','day_of_week','trend_by_month']
 
 def preprocess_input(data):
     df = pd.DataFrame([data])
