@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự đoán CO2 Chuyến bay</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; display: flex; align-items: center; }
+        .container { max-width: 600px; width: 90%; margin: auto; padding: 30px; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+        label { display: block; margin: 15px 0 8px; font-weight: 600; color: #34495e; }
+        select, input[type="date"] { 
+            padding: 12px; width: 100%; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; 
+            transition: border 0.3s;
+        }
+        select:focus, input:focus { border-color: #3498db; outline: none; }
+        button { 
+            width: 100%; padding: 14px; margin-top: 25px; background: #27ae60; color: white; 
+            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #219a52; }
+        button:disabled { background: #95a5a6; cursor: not-allowed; }
+        .result { margin-top: 25px; padding: 18px; background: #d5f4e6; border-radius: 10px; text-align: center; font-size: 1.3em; font-weight: bold; color: #27ae60; }
+        .error { color: #e74c3c; background: #fadbd8; padding: 12px; border-radius: 8px; margin-top: 15px; text-align: center; }
+        .note { font-size: 0.9em; color: #7f8c8d; text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Dự đoán lượng CO₂ (Economy Class)</h2>
+        <form method="POST" action="/predict" id="flightForm">
+            <label for="carrier">Hãng bay:</label>
+            <select name="carrier" id="carrier" required>
+                <option value="">-- Chọn hãng bay --</option>
+                <option value="2S">2S - Ryanair</option>
+                <option value="VN">VN - Vietnam Airlines</option>
+                <option value="VJ">VJ - Vietjet Air</option>
+                <option value="QH">QH - Bamboo Airways</option>
+                <option value="BL">BL - Jetstar Pacific</option>
+            </select>
+
+            <label for="origin">Nơi đi:</label>
+            <select name="origin" id="origin" required>
+                <option value="">-- Chọn sân bay đi --</option>
+                <option value="HN">Hà Nội (HAN)</option>
+                <option value="SG">TP.HCM (SGN)</option>
+                <option value="DN">Đà Nẵng (DAD)</option>
+                <option value="HP">Hải Phòng (HPH)</option>
+                <option value="CX">Cần Thơ (VCA)</option>
+                <option value="TH">Thanh Hóa (THD)</option>
+                <option value="PX">Pleiku (PXU)</option>
+            </select>
+
+            <label for="destination">Nơi đến:</label>
+            <select name="destination" id="destination" required>
+                <option value="">-- Chọn sân bay đến --</option>
+                <option value="SG">TP.HCM (SGN)</option>
+                <option value="HN">Hà Nội (HAN)</option>
+                <option value="DN">Đà Nẵng (DAD)</option>
+                <option value="HP">Hải Phòng (HPH)</option>
+                <option value="CX">Cần Thơ (VCA)</option>
+                <option value="TH">Thanh Hóa (THD)</option>
+                <option value="PX">Pleiku (PXU)</option>
+            </select>
+
+            <label for="departure_date">Ngày khởi hành:</label>
+            <input 
+                type="date" 
+                name="departure_date" 
+                id="departure_date" 
+                min="2024-03-01" 
+                max="2025-03-31" 
+                required
+            >
+
+            <button type="submit" id="submitBtn">Dự đoán CO₂</button>
+        </form>
+
+        {% if prediction is defined and prediction %}
+        <div class="result">
+            Dự đoán: <strong>{{ prediction }} gram CO₂</strong>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <p class="note">Dữ liệu chỉ hỗ trợ từ 01/03/2024 → 31/03/2025</p>
+    </div>
+
+    <script>
+
+        const today = new Date().toISOString().split('T')[0];
+        const dateInput = document.getElementById('departure_date');
+        const minDate = '2024-03-01';
+        const maxDate = '2025-03-31';
+
+        if (today >= minDate && today <= maxDate) {
+            dateInput.value = today;
+        } else if (today < minDate) {
+            dateInput.value = minDate;
+        }
+
+
+        const origin = document.getElementById('origin');
+        const dest = document.getElementById('destination');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function validateRoute() {
+            if (origin.value && dest.value && origin.value === dest.value) {
+                alert('Nơi đi và nơi đến không được trùng nhau!');
+                submitBtn.disabled = true;
+            } else {
+                submitBtn.disabled = false;
+            }
+        }
+
+        origin.addEventListener('change', validateRoute);
+        dest.addEventListener('change', validateRoute);
+    </script>
+</body>
+</html>
